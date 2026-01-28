@@ -11,10 +11,10 @@ mainGui.Name = "ScotboostGUI"
 mainGui.ResetOnSpawn = false
 mainGui.Parent = playerGui
 
--- Main Frame
+-- Main Frame (AMPLIADO)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 600, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 600, 0, 360)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -180)
 mainFrame.BackgroundColor3 = Color3.fromRGB(255, 220, 0)
 mainFrame.BackgroundTransparency = 0.2
 mainFrame.BorderSizePixel = 2
@@ -63,74 +63,72 @@ highlight.ZIndex = scriptBox.ZIndex - 1
 highlight.Parent = mainFrame
 
 scriptBox:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-local newSize = math.clamp(math.floor(scriptBox.AbsoluteSize.Y / 12), 10, 20)
-scriptBox.TextSize = newSize
-highlight.TextSize = newSize
+    local newSize = math.clamp(math.floor(scriptBox.AbsoluteSize.Y / 12), 10, 20)
+    scriptBox.TextSize = newSize
+    highlight.TextSize = newSize
 end)
 
 local function updateHighlight()
-local text = scriptBox.Text
-local words = text:split(" ")
-local colored = ""
-for _, w in ipairs(words) do
-if string.find(w, "http") then
-colored ..= "<font color='rgb(0,100,200)'>"..w.."</font> "
-elseif string.find(w, "local") or string.find(w, "function") or string.find(w, "end") then
-colored ..= "<font color='rgb(200,50,50)'>"..w.."</font> "
-else
-colored ..= "<font color='rgb(0,130,0)'>"..w.."</font> "
-end
-end
-highlight.Text = colored
+    local text = scriptBox.Text
+    local words = text:split(" ")
+    local colored = ""
+    for _, w in ipairs(words) do
+        if string.find(w, "http") then
+            colored ..= "<font color='rgb(0,100,200)'>"..w.."</font> "
+        elseif string.find(w, "local") or string.find(w, "function") or string.find(w, "end") then
+            colored ..= "<font color='rgb(200,50,50)'>"..w.."</font> "
+        else
+            colored ..= "<font color='rgb(0,130,0)'>"..w.."</font> "
+        end
+    end
+    highlight.Text = colored
 end
 scriptBox:GetPropertyChangedSignal("Text"):Connect(updateHighlight)
 
 -- Button Styling
 local function styleButton(button, text, posX, posY)
-button.Size = UDim2.new(0, 100, 0, 30)
-button.Position = UDim2.new(0, posX, 0, posY)
-button.Text = text
-button.BackgroundColor3 = Color3.fromRGB(255, 210, 0)
-button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-button.BorderSizePixel = 2
-button.TextColor3 = Color3.fromRGB(0, 0, 0)
-button.Font = Enum.Font.GothamBold
-button.TextSize = 14
-button.Parent = mainFrame
+    button.Size = UDim2.new(0, 100, 0, 30)
+    button.Position = UDim2.new(0, posX, 0, posY)
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(255, 210, 0)
+    button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    button.BorderSizePixel = 2
+    button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.Parent = mainFrame
 end
 
 -- Execute
 local execButton = Instance.new("TextButton")
 styleButton(execButton, "Execute", 10, 230)
 execButton.MouseButton1Click:Connect(function()
-local code = scriptBox.Text
-if code and code ~= "" then
-local func, err = loadstring(code)
-if func then
-func()
-else
-warn("Error:", err)
-end
-end
+    local code = scriptBox.Text
+    if code and code ~= "" then
+        local func, err = loadstring(code)
+        if func then
+            func()
+        else
+            warn("Error:", err)
+        end
+    end
 end)
 
 -- Clear
 local clearButton = Instance.new("TextButton")
 styleButton(clearButton, "Clear", 120, 230)
 clearButton.MouseButton1Click:Connect(function()
-scriptBox.Text = ""
-updateHighlight()
+    scriptBox.Text = ""
+    updateHighlight()
 end)
 
--- Reset (forzado sin bugs)
+-- Reset
 local resetButton = Instance.new("TextButton")
 styleButton(resetButton, "Reset", 230, 230)
 resetButton.MouseButton1Click:Connect(function()
-local char = player.Character
-local hum = char and char:FindFirstChildOfClass("Humanoid")
-if hum then
-hum:ChangeState(Enum.HumanoidStateType.Dead)
-end
+    local char = player.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
 end)
 
 -- ESP
@@ -141,110 +139,111 @@ local ESP_Active = false
 local ESP_Connections = {}
 
 local function CreateESP(plr)
-local highlightESP = Instance.new("Highlight")
-highlightESP.Parent = plr.Character
-highlightESP.FillColor = Color3.fromRGB(255, 0, 0)
-highlightESP.OutlineColor = Color3.fromRGB(255, 255, 255)
-highlightESP.FillTransparency = 0.5
-highlightESP.Adornee = plr.Character
-highlightESP.Name = "PlayerESP"
+    local highlightESP = Instance.new("Highlight")
+    highlightESP.Parent = plr.Character
+    highlightESP.FillColor = Color3.fromRGB(255, 0, 0)
+    highlightESP.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlightESP.FillTransparency = 0.5
+    highlightESP.Adornee = plr.Character
+    highlightESP.Name = "PlayerESP"
 end
 
 local function EnableESP()
-for _, plr in pairs(game.Players:GetPlayers()) do
-if plr ~= player and plr.Character then
-CreateESP(plr)
-end
-end
-table.insert(ESP_Connections, game.Players.PlayerAdded:Connect(function(plr)
-plr.CharacterAdded:Connect(function()
-CreateESP(plr)
-end)
-end))
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character then CreateESP(plr) end
+    end
+    table.insert(ESP_Connections, game.Players.PlayerAdded:Connect(function(plr)
+        plr.CharacterAdded:Connect(function() CreateESP(plr) end)
+    end))
 end
 
 local function DisableESP()
-for _, plr in pairs(game.Players:GetPlayers()) do
-if plr.Character and plr.Character:FindFirstChild("PlayerESP") then
-plr.Character.PlayerESP:Destroy()
-end
-end
-for _, conn in ipairs(ESP_Connections) do conn:Disconnect() end
-ESP_Connections = {}
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("PlayerESP") then
+            plr.Character.PlayerESP:Destroy()
+        end
+    end
+    for _, conn in ipairs(ESP_Connections) do conn:Disconnect() end
+    ESP_Connections = {}
 end
 
 injectESPButton.MouseButton1Click:Connect(function()
-ESP_Active = not ESP_Active
-if ESP_Active then
-EnableESP()
-injectESPButton.Text = "Stop ESP"
-else
-DisableESP()
-injectESPButton.Text = "ESP"
-end
+    ESP_Active = not ESP_Active
+    if ESP_Active then
+        EnableESP()
+        injectESPButton.Text = "Stop ESP"
+    else
+        DisableESP()
+        injectESPButton.Text = "ESP"
+    end
 end)
 
 -- COOL GUI
 local coolGuiButton = Instance.new("TextButton")
 styleButton(coolGuiButton, "Cool GUI", 450, 230)
 coolGuiButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/MiRw3b/c00lgui-v3rx/main/c00lguiv3rx.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiRw3b/c00lgui-v3rx/main/c00lguiv3rx.lua"))()
 end)
 
 -- BIG HAND
 local bigHandButton = Instance.new("TextButton")
 styleButton(bigHandButton, "Big Hand", 560, 230)
 bigHandButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand"))()
 end)
 
 -- Ro-Xploit 6.0
 local roXploitButton = Instance.new("TextButton")
 styleButton(roXploitButton, "Ro-Xploit", 10, 270)
 roXploitButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-ro-xploit-6-9233"))()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-ro-xploit-6-9233"))()
 end)
 
 -- Raining Tacos
 local rainingTacosButton = Instance.new("TextButton")
 styleButton(rainingTacosButton, "Raining Tacos", 120, 270)
 rainingTacosButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://pastebin.com/raw/Yx05z4L5"))()
+    loadstring(game:HttpGet("https://pastebin.com/raw/Yx05z4L5"))()
 end)
+
 -- DELTA KEYBOARD
 local deltaKeyboardButton = Instance.new("TextButton")
 styleButton(deltaKeyboardButton, "Delta Keyboard", 230, 270)
 deltaKeyboardButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt", true))()
 end)
 
 -- BAN HAMMER
 local banHammerButton = Instance.new("TextButton")
 styleButton(banHammerButton, "Ban Hammer", 340, 270)
 banHammerButton.MouseButton1Click:Connect(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/nicolasbarbosa323/ban-hammer/refs/heads/main/ban"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/nicolasbarbosa323/ban-hammer/refs/heads/main/ban"))()
 end)
 
-local steveButton = Instance.new("TextButton")
-styleButton(steveButton, "Steve", 340, 310)
-steveButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve"))()
+-- Pandora
+local pandoraButton = Instance.new("TextButton")
+styleButton(pandoraButton, "Pandora", 10, 310)
+pandoraButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/pandora"))()
 end)
 
-local primadonButton = Instance.new("TextButton")
-styleButton(primadonButton, "Primadon", 230, 310)
-primadonButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Primadon"))()
-end)
-
+-- Grab Gun
 local grabGunButton = Instance.new("TextButton")
 styleButton(grabGunButton, "Grab Gun", 120, 310)
 grabGunButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/grab"))()
 end)
 
-local pandoraButton = Instance.new("TextButton")
-styleButton(pandoraButton, "Pandora", 10, 310)
-pandoraButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/pandora"))()
+-- Primadon
+local primadonButton = Instance.new("TextButton")
+styleButton(primadonButton, "Primadon", 230, 310)
+primadonButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Primadon"))()
+end)
+
+-- Steve
+local steveButton = Instance.new("TextButton")
+styleButton(steveButton, "Steve", 340, 310)
+steveButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve"))()
 end)
