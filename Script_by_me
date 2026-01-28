@@ -247,3 +247,10 @@ styleButton(steveButton, "Steve", 340, 310)
 steveButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve"))()
 end)
+
+-- Botón R15 → R6
+local r6Button = Instance.new("TextButton")
+styleButton(r6Button, "R15 → R6", 450, 310)
+r6Button.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6"))()
+end)
