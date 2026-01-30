@@ -254,3 +254,31 @@ styleButton(r6Button, "R15 → R6", 450, 310)
 r6Button.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6"))()
 end)
+
+--server admin
+local serverAdminButton = Instance.new("TextButton")
+styleButton(serverAdminButton, "Server Admin", 340, 350)
+serverAdminButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/gObl00x/Pendulum-Fixed-AND-Others-Scripts/refs/heads/main/Server%20Admin"))()
+end)
+
+--jhon doe
+local johnDoeButton = Instance.new("TextButton")
+styleButton(johnDoeButton, "John Doe", 230, 350)
+johnDoeButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-John-Doe-Script-46855"))()
+end)
+
+--sin dragón
+local feSinDragonButton = Instance.new("TextButton")
+styleButton(feSinDragonButton, "Sin Dragon", 10, 350)
+feSinDragonButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/2aRWmwRF"))()
+end)
+
+--forsaken
+local forsakenButton = Instance.new("TextButton")
+styleButton(forsakenButton, "Forsaken", 120, 350)
+forsakenButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-FE-C00lKidd-Forsaken-UNIVERSAL-FOR-R6-44107"))()
+end)
