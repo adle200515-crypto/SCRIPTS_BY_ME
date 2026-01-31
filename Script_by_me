@@ -1,284 +1,213 @@
---// Scotboost Executor (Yellow Edition) //--
+--// Scotboost Executor (GamePass + Pestañas + Scroll Scripts) //--
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local MarketplaceService = game:GetService("MarketplaceService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- GUI
+-- ID Game Pass
+local GAMEPASS_ID = 1694093718
+
+-- Comprobar Game Pass
+local hasPass = false
+pcall(function()
+    hasPass = MarketplaceService:UserOwnsGamePassAsync(player.UserId, GAMEPASS_ID)
+end)
+
+-- Si no tiene Game Pass, mostrar aviso y bloquear
+if not hasPass then
+    local warnFrame = Instance.new("Frame")
+    warnFrame.Size = UDim2.new(0,400,0,200)
+    warnFrame.Position = UDim2.new(0.5,-200,0.5,-100)
+    warnFrame.BackgroundColor3 = Color3.fromRGB(255,100,100)
+    warnFrame.BorderSizePixel = 2
+    warnFrame.BorderColor3 = Color3.fromRGB(0,0,0)
+    warnFrame.Parent = playerGui
+
+    local warnText = Instance.new("TextLabel")
+    warnText.Size = UDim2.new(1,0,1,0)
+    warnText.BackgroundTransparency = 1
+    warnText.Text = "❌ Ve a comprar el script mediante el Discord"
+    warnText.TextColor3 = Color3.fromRGB(0,0,0)
+    warnText.Font = Enum.Font.GothamBold
+    warnText.TextScaled = true
+    warnText.Parent = warnFrame
+
+    return
+end
+
+-- GUI principal
 local mainGui = Instance.new("ScreenGui")
 mainGui.Name = "ScotboostGUI"
 mainGui.ResetOnSpawn = false
 mainGui.Parent = playerGui
 
--- Main Frame (AMPLIADO)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 600, 0, 360)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -180)
-mainFrame.BackgroundColor3 = Color3.fromRGB(255, 220, 0)
+mainFrame.Size = UDim2.new(0, 600, 0, 400)
+mainFrame.Position = UDim2.new(0.5,-300,0.5,-200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(255,220,0)
 mainFrame.BackgroundTransparency = 0.2
 mainFrame.BorderSizePixel = 2
-mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BorderColor3 = Color3.fromRGB(0,0,0)
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = mainGui
 
--- Title
+-- Título
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
+title.Size = UDim2.new(1,0,0,30)
 title.BackgroundTransparency = 1
 title.Text = "Scotboost"
-title.TextColor3 = Color3.fromRGB(0, 0, 0)
+title.TextColor3 = Color3.fromRGB(0,0,0)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 title.Parent = mainFrame
 
--- Script Box
+-- Pestañas
+local tabFrame = Instance.new("Frame")
+tabFrame.Size = UDim2.new(1,0,0,30)
+tabFrame.Position = UDim2.new(0,0,0,30)
+tabFrame.BackgroundTransparency = 1
+tabFrame.Parent = mainFrame
+
+local function createTabButton(name, posX)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0,100,1,0)
+    btn.Position = UDim2.new(0,posX,0,0)
+    btn.Text = name
+    btn.BackgroundColor3 = Color3.fromRGB(255,210,0)
+    btn.BorderColor3 = Color3.fromRGB(0,0,0)
+    btn.BorderSizePixel = 2
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.TextColor3 = Color3.fromRGB(0,0,0)
+    btn.Parent = tabFrame
+    return btn
+end
+
+local executeTabBtn = createTabButton("Execute",10)
+local scriptsTabBtn = createTabButton("Scripts",120)
+
+-- Zonas
+local executeFrame = Instance.new("Frame")
+executeFrame.Size = UDim2.new(1, -20, 1, -70)
+executeFrame.Position = UDim2.new(0,10,0,70)
+executeFrame.BackgroundTransparency = 1
+executeFrame.Parent = mainFrame
+
+local scriptsFrame = Instance.new("Frame")
+scriptsFrame.Size = executeFrame.Size
+scriptsFrame.Position = executeFrame.Position
+scriptsFrame.BackgroundTransparency = 1
+scriptsFrame.Visible = false
+scriptsFrame.Parent = mainFrame
+
+-- SWITCH PESTAÑAS
+executeTabBtn.MouseButton1Click:Connect(function()
+    executeFrame.Visible = true
+    scriptsFrame.Visible = false
+end)
+
+scriptsTabBtn.MouseButton1Click:Connect(function()
+    executeFrame.Visible = false
+    scriptsFrame.Visible = true
+end)
+
+-- SCRIPT BOX + BOTONES (Execute)
 local scriptBox = Instance.new("TextBox")
 scriptBox.Size = UDim2.new(1, -20, 0, 180)
-scriptBox.Position = UDim2.new(0, 10, 0, 35)
+scriptBox.Position = UDim2.new(0,0,0,0)
 scriptBox.MultiLine = true
 scriptBox.ClearTextOnFocus = false
-scriptBox.BackgroundColor3 = Color3.fromRGB(255, 240, 150)
-scriptBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+scriptBox.BackgroundColor3 = Color3.fromRGB(255,240,150)
+scriptBox.TextColor3 = Color3.fromRGB(0,0,0)
 scriptBox.Text = ""
 scriptBox.Font = Enum.Font.Code
 scriptBox.TextSize = 14
 scriptBox.TextXAlignment = Enum.TextXAlignment.Left
 scriptBox.TextYAlignment = Enum.TextYAlignment.Top
-scriptBox.Parent = mainFrame
+scriptBox.Parent = executeFrame
 
--- Syntax Highlight Overlay
-local highlight = Instance.new("TextLabel")
-highlight.Size = scriptBox.Size
-highlight.Position = scriptBox.Position
-highlight.BackgroundTransparency = 1
-highlight.TextXAlignment = Enum.TextXAlignment.Left
-highlight.TextYAlignment = Enum.TextYAlignment.Top
-highlight.Font = Enum.Font.Code
-highlight.TextSize = scriptBox.TextSize
-highlight.Text = ""
-highlight.RichText = true
-highlight.ZIndex = scriptBox.ZIndex - 1
-highlight.Parent = mainFrame
-
-scriptBox:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-    local newSize = math.clamp(math.floor(scriptBox.AbsoluteSize.Y / 12), 10, 20)
-    scriptBox.TextSize = newSize
-    highlight.TextSize = newSize
-end)
-
-local function updateHighlight()
-    local text = scriptBox.Text
-    local words = text:split(" ")
-    local colored = ""
-    for _, w in ipairs(words) do
-        if string.find(w, "http") then
-            colored ..= "<font color='rgb(0,100,200)'>"..w.."</font> "
-        elseif string.find(w, "local") or string.find(w, "function") or string.find(w, "end") then
-            colored ..= "<font color='rgb(200,50,50)'>"..w.."</font> "
-        else
-            colored ..= "<font color='rgb(0,130,0)'>"..w.."</font> "
-        end
-    end
-    highlight.Text = colored
-end
-scriptBox:GetPropertyChangedSignal("Text"):Connect(updateHighlight)
-
--- Button Styling
+-- Botones Execute / Clear
 local function styleButton(button, text, posX, posY)
-    button.Size = UDim2.new(0, 100, 0, 30)
-    button.Position = UDim2.new(0, posX, 0, posY)
+    button.Size = UDim2.new(0,100,0,30)
+    button.Position = UDim2.new(0,posX,0,posY)
     button.Text = text
-    button.BackgroundColor3 = Color3.fromRGB(255, 210, 0)
-    button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    button.BackgroundColor3 = Color3.fromRGB(255,210,0)
+    button.BorderColor3 = Color3.fromRGB(0,0,0)
     button.BorderSizePixel = 2
-    button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    button.TextColor3 = Color3.fromRGB(0,0,0)
     button.Font = Enum.Font.GothamBold
     button.TextSize = 14
-    button.Parent = mainFrame
+    button.Parent = executeFrame
 end
 
--- Execute
 local execButton = Instance.new("TextButton")
-styleButton(execButton, "Execute", 10, 230)
+styleButton(execButton,"Execute",0,190)
 execButton.MouseButton1Click:Connect(function()
     local code = scriptBox.Text
     if code and code ~= "" then
         local func, err = loadstring(code)
-        if func then
-            func()
-        else
-            warn("Error:", err)
-        end
+        if func then func() else warn("Error:",err) end
     end
 end)
 
--- Clear
 local clearButton = Instance.new("TextButton")
-styleButton(clearButton, "Clear", 120, 230)
+styleButton(clearButton,"Clear",110,190)
 clearButton.MouseButton1Click:Connect(function()
     scriptBox.Text = ""
-    updateHighlight()
 end)
 
--- Reset
-local resetButton = Instance.new("TextButton")
-styleButton(resetButton, "Reset", 230, 230)
-resetButton.MouseButton1Click:Connect(function()
-    local char = player.Character
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
-    if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
-end)
+-- SCROLLFRAME PARA SCRIPTS
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1,0,1,0)
+scrollFrame.Position = UDim2.new(0,0,0,0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.CanvasSize = UDim2.new(0,0,0,0)
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.Parent = scriptsFrame
 
--- ESP
-local injectESPButton = Instance.new("TextButton")
-styleButton(injectESPButton, "ESP", 340, 230)
+local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = scrollFrame
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Padding = UDim.new(0,5)
 
-local ESP_Active = false
-local ESP_Connections = {}
-
-local function CreateESP(plr)
-    local highlightESP = Instance.new("Highlight")
-    highlightESP.Parent = plr.Character
-    highlightESP.FillColor = Color3.fromRGB(255, 0, 0)
-    highlightESP.OutlineColor = Color3.fromRGB(255, 255, 255)
-    highlightESP.FillTransparency = 0.5
-    highlightESP.Adornee = plr.Character
-    highlightESP.Name = "PlayerESP"
+-- Función para agregar scripts
+local function addScriptButton(name,url)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,0,0,30)
+    btn.Text = name
+    btn.BackgroundColor3 = Color3.fromRGB(255,210,0)
+    btn.BorderColor3 = Color3.fromRGB(0,0,0)
+    btn.BorderSizePixel = 2
+    btn.TextColor3 = Color3.fromRGB(0,0,0)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = scrollFrame
+    btn.MouseButton1Click:Connect(function()
+        loadstring(game:HttpGet(url))()
+    end)
 end
 
-local function EnableESP()
-    for _, plr in pairs(game.Players:GetPlayers()) do
-        if plr ~= player and plr.Character then CreateESP(plr) end
-    end
-    table.insert(ESP_Connections, game.Players.PlayerAdded:Connect(function(plr)
-        plr.CharacterAdded:Connect(function() CreateESP(plr) end)
-    end))
-end
+-- Aquí tus scripts
+addScriptButton("FE Sin Dragon","https://pastebin.com/raw/2aRWmwRF")
+addScriptButton("Forsaken","https://rawscripts.net/raw/Universal-Script-FE-C00lKidd-Forsaken-UNIVERSAL-FOR-R6-44107")
+addScriptButton("John Doe","https://rawscripts.net/raw/Universal-Script-John-Doe-Script-46855")
+addScriptButton("Server Admin","https://raw.githubusercontent.com/gObl00x/Pendulum-Fixed-AND-Others-Scripts/refs/heads/main/Server%20Admin")
+addScriptButton("Cool GUI","https://raw.githubusercontent.com/MiRw3b/c00lgui-v3rx/main/c00lguiv3rx.lua")
+addScriptButton("Big Hand","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand")
+addScriptButton("Ro-Xploit 6.0","https://rawscripts.net/raw/Universal-Script-ro-xploit-6-9233")
+addScriptButton("Raining Tacos","https://pastebin.com/raw/Yx05z4L5")
+addScriptButton("Delta Keyboard","https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt")
+addScriptButton("Ban Hammer","https://raw.githubusercontent.com/nicolasbarbosa323/ban-hammer/refs/heads/main/ban")
+addScriptButton("Pandora","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/pandora")
+addScriptButton("Grab Gun","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/grab")
+addScriptButton("Primadon","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Primadon")
+addScriptButton("Steve","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve")
+addScriptButton("R15 → R6","https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6")
 
-local function DisableESP()
-    for _, plr in pairs(game.Players:GetPlayers()) do
-        if plr.Character and plr.Character:FindFirstChild("PlayerESP") then
-            plr.Character.PlayerESP:Destroy()
-        end
-    end
-    for _, conn in ipairs(ESP_Connections) do conn:Disconnect() end
-    ESP_Connections = {}
-end
-
-injectESPButton.MouseButton1Click:Connect(function()
-    ESP_Active = not ESP_Active
-    if ESP_Active then
-        EnableESP()
-        injectESPButton.Text = "Stop ESP"
-    else
-        DisableESP()
-        injectESPButton.Text = "ESP"
-    end
-end)
-
--- COOL GUI
-local coolGuiButton = Instance.new("TextButton")
-styleButton(coolGuiButton, "Cool GUI", 450, 230)
-coolGuiButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiRw3b/c00lgui-v3rx/main/c00lguiv3rx.lua"))()
-end)
-
--- BIG HAND
-local bigHandButton = Instance.new("TextButton")
-styleButton(bigHandButton, "Big Hand", 560, 230)
-bigHandButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand"))()
-end)
-
--- Ro-Xploit 6.0
-local roXploitButton = Instance.new("TextButton")
-styleButton(roXploitButton, "Ro-Xploit", 10, 270)
-roXploitButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-ro-xploit-6-9233"))()
-end)
-
--- Raining Tacos
-local rainingTacosButton = Instance.new("TextButton")
-styleButton(rainingTacosButton, "Raining Tacos", 120, 270)
-rainingTacosButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://pastebin.com/raw/Yx05z4L5"))()
-end)
-
--- DELTA KEYBOARD
-local deltaKeyboardButton = Instance.new("TextButton")
-styleButton(deltaKeyboardButton, "Delta Keyboard", 230, 270)
-deltaKeyboardButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt", true))()
-end)
-
--- BAN HAMMER
-local banHammerButton = Instance.new("TextButton")
-styleButton(banHammerButton, "Ban Hammer", 340, 270)
-banHammerButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/nicolasbarbosa323/ban-hammer/refs/heads/main/ban"))()
-end)
-
--- Pandora
-local pandoraButton = Instance.new("TextButton")
-styleButton(pandoraButton, "Pandora", 10, 310)
-pandoraButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/pandora"))()
-end)
-
--- Grab Gun
-local grabGunButton = Instance.new("TextButton")
-styleButton(grabGunButton, "Grab Gun", 120, 310)
-grabGunButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/grab"))()
-end)
-
--- Primadon
-local primadonButton = Instance.new("TextButton")
-styleButton(primadonButton, "Primadon", 230, 310)
-primadonButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Primadon"))()
-end)
-
--- Steve
-local steveButton = Instance.new("TextButton")
-styleButton(steveButton, "Steve", 340, 310)
-steveButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve"))()
-end)
-
--- Botón R15 → R6
-local r6Button = Instance.new("TextButton")
-styleButton(r6Button, "R15 → R6", 450, 310)
-r6Button.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6"))()
-end)
-
---server admin
-local serverAdminButton = Instance.new("TextButton")
-styleButton(serverAdminButton, "Server Admin", 340, 350)
-serverAdminButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/gObl00x/Pendulum-Fixed-AND-Others-Scripts/refs/heads/main/Server%20Admin"))()
-end)
-
---jhon doe
-local johnDoeButton = Instance.new("TextButton")
-styleButton(johnDoeButton, "John Doe", 230, 350)
-johnDoeButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-John-Doe-Script-46855"))()
-end)
-
---sin dragón
-local feSinDragonButton = Instance.new("TextButton")
-styleButton(feSinDragonButton, "Sin Dragon", 10, 350)
-feSinDragonButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://pastebin.com/raw/2aRWmwRF"))()
-end)
-
---forsaken
-local forsakenButton = Instance.new("TextButton")
-styleButton(forsakenButton, "Forsaken", 120, 350)
-forsakenButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-FE-C00lKidd-Forsaken-UNIVERSAL-FOR-R6-44107"))()
+-- Ajuste canvas Scroll
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrollFrame.CanvasSize = UDim2.new(0,0,0,listLayout.AbsoluteContentSize.Y + 5)
 end)
