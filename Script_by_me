@@ -1,7 +1,4 @@
-hermano en verdad me vas a robar el script pero bueno róbalo ✌🫩
--- ============================================
--- PROTECCIÓN ANTI-GUI DUPLICADA
--- ============================================
+
 local kickPlaceId = 74918992335762
 local player = game:GetService("Players").LocalPlayer
 
