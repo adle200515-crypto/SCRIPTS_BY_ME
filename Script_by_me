@@ -1,4 +1,3 @@
-
 local kickPlaceId = 74918992335762
 local player = game:GetService("Players").LocalPlayer
 
@@ -51,7 +50,7 @@ local PREMIUM_GAMEPASS_ID = 1796996414 -- TU GAMEPASS ID
 -- Lista de amigos (IDs de Roblox) - ¡Acceso TOTAL!
 local AMIGOS = {
     10233126593,  -- Amigo 1
-    987654321,  -- Amigo 2
+    8152564798,  -- Amigo 2
     555666777,  -- Amigo 3
 }
 
@@ -108,7 +107,35 @@ local PREMIUM_SCRIPTS = {
     "Anti Skids",
     "Snake Sniper",
     "K00pgui V2",
-    "THIS IS SPARTA"
+    "THIS IS SPARTA",
+    "CauaHub 🔑",
+    "TeamFatHub 🔑",
+    "Infinite Yield",
+    "Ro-Xploit 6.0",
+    "Ro-Xploit v7.0",
+    "Dominant",
+    "Stigma",
+    "FSA",
+    "Polaria",
+    "Sensation Hub",
+    "KoopGui V11",
+    "MatGui V8",
+    "ipadGUI V11",
+    "Undetected Hub",
+    "LuaCore",
+    "Lua Hammer",
+    "Call GUI",
+    "Crucifix",
+    "The Backrooms",
+    "Computer Crasher",
+    "Grab Knife V4",
+    "Project Sonic",
+    "SFFS",
+    "SW",
+    "Mhorp GUI",
+    "Happy Hub SS",
+    "Portal Tool",
+    "Tool Pack"
 }
 
 -- ============================================
@@ -857,17 +884,24 @@ CreditLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 CreditLabel.Text = "LUAU REMAKE / MÉXICO VERSION\nRemake por: teto_xd.real (TikTok)\nDeobf original: worriedBr4\nVersión: V5.1 MX"
 CreditLabel.Parent = CreditBox
 
-RunService.RenderStepped:Connect(function()
-    local dt = RunService.Heartbeat:Wait()
-    local fps = math.floor(1 / dt)
-    local pingStat = Stats.Network.ServerStatsItem["Data Ping"]
-    local ping = pingStat and math.floor(pingStat:GetValue()) or 0
-    
-    ServerBox.Text = "👥 Jugadores: " .. #Players:GetPlayers() ..
-        "\n📶 Ping: " .. ping .. "ms" ..
-        "\n🎮 FPS: " .. fps ..
-        "\n🌎 Región: MX/US" ..
-        "\n📍 PlaceId: " .. game.PlaceId
+-- Variables para optimización
+local lastUpdate = 0
+local UPDATE_INTERVAL = 0.5
+
+RunService.RenderStepped:Connect(function(deltaTime)
+    lastUpdate = lastUpdate + deltaTime
+    if lastUpdate >= UPDATE_INTERVAL then
+        lastUpdate = 0
+        local fps = math.floor(1 / deltaTime)
+        local pingStat = Stats.Network.ServerStatsItem["Data Ping"]
+        local ping = pingStat and math.floor(pingStat:GetValue()) or 0
+        
+        ServerBox.Text = "👥 Jugadores: " .. #Players:GetPlayers() ..
+            "\n📶 Ping: " .. ping .. "ms" ..
+            "\n🎮 FPS: " .. fps ..
+            "\n🌎 Región: MX/US" ..
+            "\n📍 PlaceId: " .. game.PlaceId
+    end
 end)
 
 task.spawn(function()
@@ -1530,7 +1564,7 @@ local function createAdminButton(parent, text, color, callback, width)
     return btn
 end
 
--- Función para crear dropdown de jugadores
+-- Función para crear dropdown de jugadores (CORREGIDO)
 local function createPlayerDropdown(parent, placeholder)
     local dropdown = Instance.new("Frame")
     dropdown.Size = UDim2.new(0.45, 0, 0, 35)
@@ -1538,6 +1572,7 @@ local function createPlayerDropdown(parent, placeholder)
     dropdown.BackgroundTransparency = 0.2
     dropdown.BorderSizePixel = 0
     dropdown.Parent = parent
+    dropdown.ZIndex = 10
     
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 6)
@@ -1558,6 +1593,7 @@ local function createPlayerDropdown(parent, placeholder)
     selectedText.TextColor3 = Color3.fromRGB(200, 200, 200)
     selectedText.TextXAlignment = Enum.TextXAlignment.Left
     selectedText.Parent = dropdown
+    selectedText.ZIndex = 10
     
     local arrow = Instance.new("TextLabel")
     arrow.Size = UDim2.new(0, 20, 1, 0)
@@ -1568,15 +1604,25 @@ local function createPlayerDropdown(parent, placeholder)
     arrow.TextSize = 14
     arrow.TextColor3 = Color3.fromRGB(0, 200, 0)
     arrow.Parent = dropdown
+    arrow.ZIndex = 10
+    
+    local playerListContainer = Instance.new("Frame")
+    playerListContainer.Size = UDim2.new(1, 0, 0, 150)
+    playerListContainer.Position = UDim2.new(0, 0, 1, 5)
+    playerListContainer.BackgroundTransparency = 1
+    playerListContainer.Visible = false
+    playerListContainer.Parent = dropdown
+    playerListContainer.ZIndex = 100
     
     local playerList = Instance.new("ScrollingFrame")
-    playerList.Size = UDim2.new(1, 0, 0, 150)
-    playerList.Position = UDim2.new(0, 0, 1, 5)
+    playerList.Size = UDim2.new(1, 0, 1, 0)
     playerList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     playerList.BorderSizePixel = 0
-    playerList.Visible = false
-    playerList.Parent = dropdown
-    playerList.ZIndex = 10
+    playerList.Parent = playerListContainer
+    playerList.ZIndex = 100
+    playerList.ScrollBarThickness = 4
+    playerList.ScrollBarImageColor3 = Color3.fromRGB(0, 150, 0)
+    playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
     
     local listCorner = Instance.new("UICorner")
     listCorner.CornerRadius = UDim.new(0, 6)
@@ -1595,22 +1641,27 @@ local function createPlayerDropdown(parent, placeholder)
     
     local function refreshPlayerList()
         for _, child in ipairs(playerList:GetChildren()) do
-            if child:IsA("TextButton") then
+            if child:IsA("TextButton") or child:IsA("TextLabel") then
                 child:Destroy()
             end
         end
         
-        for _, plr in ipairs(Players:GetPlayers()) do
+        local players = Players:GetPlayers()
+        local hasPlayers = false
+        
+        for _, plr in ipairs(players) do
             if plr ~= LocalPlayer then
+                hasPlayers = true
                 local btn = Instance.new("TextButton")
                 btn.Size = UDim2.new(1, -4, 0, 30)
                 btn.Position = UDim2.new(0, 2, 0, 0)
                 btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-                btn.Text = plr.Name
+                btn.Text = plr.Name .. (plr == selectedPlayer and " ✓" or "")
                 btn.Font = Enum.Font.Gotham
                 btn.TextSize = 12
                 btn.TextColor3 = Color3.fromRGB(255, 255, 255)
                 btn.Parent = playerList
+                btn.ZIndex = 100
                 
                 local btnCorner = Instance.new("UICorner")
                 btnCorner.CornerRadius = UDim.new(0, 4)
@@ -1619,9 +1670,22 @@ local function createPlayerDropdown(parent, placeholder)
                 btn.MouseButton1Click:Connect(function()
                     selectedPlayer = plr
                     selectedText.Text = plr.Name
-                    playerList.Visible = false
+                    playerListContainer.Visible = false
+                    refreshPlayerList()
                 end)
             end
+        end
+        
+        if not hasPlayers then
+            local noPlayersLabel = Instance.new("TextLabel")
+            noPlayersLabel.Size = UDim2.new(1, -4, 0, 30)
+            noPlayersLabel.Position = UDim2.new(0, 2, 0, 0)
+            noPlayersLabel.BackgroundTransparency = 1
+            noPlayersLabel.Text = "No hay jugadores"
+            noPlayersLabel.Font = Enum.Font.Gotham
+            noPlayersLabel.TextSize = 12
+            noPlayersLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+            noPlayersLabel.Parent = playerList
         end
     end
     
@@ -1630,11 +1694,60 @@ local function createPlayerDropdown(parent, placeholder)
     toggleBtn.BackgroundTransparency = 1
     toggleBtn.Text = ""
     toggleBtn.Parent = dropdown
-    toggleBtn.ZIndex = 5
+    toggleBtn.ZIndex = 10
     
     toggleBtn.MouseButton1Click:Connect(function()
         refreshPlayerList()
-        playerList.Visible = not playerList.Visible
+        playerListContainer.Visible = not playerListContainer.Visible
+    end)
+    
+    local function closeDropdown()
+        playerListContainer.Visible = false
+    end
+    
+    local connection
+    connection = UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = UserInputService:GetMouseLocation()
+            local guiObjects = CoreGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y)
+            local clickedInside = false
+            
+            for _, obj in ipairs(guiObjects) do
+                if obj:IsDescendantOf(dropdown) then
+                    clickedInside = true
+                    break
+                end
+            end
+            
+            if not clickedInside then
+                closeDropdown()
+            end
+        end
+    end)
+    
+    task.spawn(function()
+        while dropdown and dropdown.Parent do
+            if playerListContainer.Visible then
+                refreshPlayerList()
+            end
+            task.wait(5)
+        end
+    end)
+    
+    Players.PlayerAdded:Connect(function()
+        if playerListContainer.Visible then
+            refreshPlayerList()
+        end
+    end)
+    
+    Players.PlayerRemoving:Connect(function(plr)
+        if selectedPlayer == plr then
+            selectedPlayer = nil
+            selectedText.Text = placeholder or "Seleccionar jugador"
+        end
+        if playerListContainer.Visible then
+            refreshPlayerList()
+        end
     end)
     
     return {
@@ -1644,7 +1757,8 @@ local function createPlayerDropdown(parent, placeholder)
             selectedPlayer = plr 
             selectedText.Text = plr and plr.Name or placeholder
         end,
-        Refresh = refreshPlayerList
+        Refresh = refreshPlayerList,
+        Close = closeDropdown
     }
 end
 
@@ -1691,14 +1805,12 @@ local playerSection = createAdminSection("👤 Acciones de Jugador", 2, 170)
 local playerDropdown = createPlayerDropdown(playerSection, "Seleccionar jugador")
 playerDropdown.Frame.Position = UDim2.new(0.02, 0, 0.2, 0)
 
--- Botón refrescar lista
 local refreshBtn = createAdminButton(playerSection, "🔄", Color3.fromRGB(100, 100, 100), function()
     playerDropdown.Refresh()
     CreateNotification("Admin", "Lista de jugadores actualizada", "Success", 2)
 end, 0.08)
 refreshBtn.Position = UDim2.new(0.48, 0, 0.2, 0)
 
--- Botones de acciones (primera fila)
 local kickBtn = createAdminButton(playerSection, "🗑️ Kick", Color3.fromRGB(200, 50, 50), function()
     local target = getTargetPlayer(playerDropdown)
     if backdoorRemote then
@@ -1744,7 +1856,6 @@ local spectateBtn = createAdminButton(playerSection, "👁️ Spectate", Color3.
 end, 0.28)
 spectateBtn.Position = UDim2.new(0.62, 0, 0.45, 0)
 
--- Segunda fila
 local bringBtn = createAdminButton(playerSection, "📦 Bring", Color3.fromRGB(0, 200, 100), function()
     local target = getTargetPlayer(playerDropdown)
     if backdoorRemote and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -1819,7 +1930,6 @@ local announceBtn = createAdminButton(serverSection, "📢 Anunciar", Color3.fro
 end, 0.35)
 announceBtn.Position = UDim2.new(0.63, 0, 0.25, 0)
 
--- Botones de servidor
 local shutdownBtn = createAdminButton(serverSection, "🔴 Shutdown", Color3.fromRGB(200, 0, 0), function()
     if backdoorRemote then
         execute('for _, p in pairs(game:GetService("Players"):GetPlayers()) do p:Kick("Servidor cerrado por Admin") end')
@@ -1861,7 +1971,6 @@ local giveBtn = createAdminButton(toolSection, "Dar Tool", Color3.fromRGB(0, 200
 end, 0.25)
 giveBtn.Position = UDim2.new(0.5, 0, 0.25, 0)
 
--- Tools predefinidas
 local toolBtn1 = createAdminButton(toolSection, "🔫 Gun", Color3.fromRGB(100, 100, 100), function()
     local target = getTargetPlayer(playerDropdown)
     if backdoorRemote then
@@ -1955,7 +2064,6 @@ DebugLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 DebugLabel.TextXAlignment = Enum.TextXAlignment.Left
 DebugLabel.Parent = ConfigPage
 
--- Toggle Switch
 local toggleFrame = Instance.new("Frame")
 toggleFrame.Size = UDim2.new(0, 50, 0, 25)
 toggleFrame.Position = UDim2.new(0.55, 0, 0.15, 0)
@@ -1997,7 +2105,6 @@ toggleBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Info de nivel en Config
 local LevelInfo = Instance.new("TextLabel")
 LevelInfo.Size = UDim2.new(0.9, 0, 0, 60)
 LevelInfo.Position = UDim2.new(0.05, 0, 0.3, 0)
@@ -2014,7 +2121,6 @@ LevelInfo.TextXAlignment = Enum.TextXAlignment.Left
 LevelInfo.TextYAlignment = Enum.TextYAlignment.Top
 LevelInfo.Parent = ConfigPage
 
--- Botón para comprar GamePass (solo visible para Free)
 if userLevel == "Free" then
     local BuyGamePassBtn = Instance.new("TextButton")
     BuyGamePassBtn.Size = UDim2.new(0.9, 0, 0, 40)
@@ -2055,6 +2161,59 @@ if userLevel == "Free" then
 end
 
 -- ============================================
+-- SISTEMA DE KEYBINDS
+-- ============================================
+local keybinds = {
+    ToggleUI = Enum.KeyCode.RightShift,
+    ExecuteScript = Enum.KeyCode.F5,
+    ScanBackdoor = Enum.KeyCode.F6
+}
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == keybinds.ToggleUI then
+        Frame.Visible = not Frame.Visible
+        Button.Visible = not Frame.Visible
+    elseif input.KeyCode == keybinds.ExecuteScript then
+        if ScriptPage.Visible then
+            executeScript()
+        end
+    elseif input.KeyCode == keybinds.ScanBackdoor then
+        if not searching then
+            searching = true
+            findBackdoor()
+            searching = false
+        end
+    end
+end)
+
+-- ============================================
+-- SISTEMA DE AUTO-SAVE
+-- ============================================
+local autoSaveEnabled = true
+local autoSaveInterval = 30
+
+task.spawn(function()
+    while true do
+        task.wait(autoSaveInterval)
+        if autoSaveEnabled and TextBox.Text ~= "" and TextBox.Text ~= "-- Escribe tu script aquí" then
+            if syn and syn.writefile then
+                syn.writefile("luau_autosave.lua", TextBox.Text)
+                CreateNotification("Auto-Save", "Código guardado automáticamente", "Success", 2)
+            end
+        end
+    end
+end)
+
+createExecButton(ScriptPage, 0.41, "rbxassetid://6026568232", function()
+    if syn and syn.isfile and syn.isfile("luau_autosave.lua") then
+        TextBox.Text = syn.readfile("luau_autosave.lua")
+        CreateNotification("Auto-Save", "Código cargado", "Success", 2)
+    end
+end)
+
+-- ============================================
 -- SISTEMA DE TRANSICIÓN ENTRE PÁGINAS
 -- ============================================
 local pages = {HomePage, ScriptPage, HubPage, AdminPage, ConfigPage}
@@ -2062,7 +2221,6 @@ local buttons = {btnHome, btnScript, btnHub, btnAdmin, btnConfig}
 local activeButton = nil
 
 local function switchPage(index)
-    -- Verificar acceso para Admin
     if index == 4 then
         if not checkFeatureAccess("Admin") then
             return
@@ -2097,7 +2255,6 @@ btnAdmin.MouseButton1Click:Connect(function()
 end)
 btnConfig.MouseButton1Click:Connect(function() switchPage(5) end)
 
--- Iniciar en Home
 switchPage(1)
 
 -- ============================================
