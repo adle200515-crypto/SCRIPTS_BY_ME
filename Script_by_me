@@ -45,25 +45,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- ============================================
 -- SISTEMA DE NIVELES DE ACCESO
 -- ============================================
-local PREMIUM_GAMEPASS_ID = 1796996414 -- TU GAMEPASS ID
+local PREMIUM_GAMEPASS_ID = 1796996414
 
--- Lista de amigos (IDs de Roblox) - ¡Acceso TOTAL!
 local AMIGOS = {
-    10233126593,  -- Amigo 1
-    8152564798,  -- Amigo 2
-    10752269211,  -- Amigo 3
+    10233126593,
+    8152564798,
+    10752269211,
 }
 
--- Variables de estado
 local userLevel = "Free"
 local isPremium = false
 local isAmigo = false
 
--- ============================================
--- VERIFICACIÓN DE ACCESO
--- ============================================
 local function checkAccess()
-    -- 1. Verificar si es Amigo (máxima prioridad)
     for _, amigoId in ipairs(AMIGOS) do
         if LocalPlayer.UserId == amigoId then
             isAmigo = true
@@ -72,7 +66,6 @@ local function checkAccess()
         end
     end
     
-    -- 2. Si no es amigo, verificar GamePass
     if not isAmigo then
         local success, hasPass = pcall(function()
             return MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, PREMIUM_GAMEPASS_ID)
@@ -89,7 +82,6 @@ local function checkAccess()
     return userLevel
 end
 
--- Iniciar verificación
 task.spawn(checkAccess)
 
 -- ============================================
@@ -135,11 +127,12 @@ local PREMIUM_SCRIPTS = {
     "Mhorp GUI",
     "Happy Hub SS",
     "Portal Tool",
-    "Tool Pack"
+    "Tool Pack",
+    "Spunchbub Backdoor",
 }
 
 -- ============================================
--- SISTEMA DE NOTIFICACIONES (ESPAÑOL)
+-- SISTEMA DE NOTIFICACIONES
 -- ============================================
 local ErrorIcon = "rbxassetid://5107154082"
 local SuccessIcon = "rbxassetid://82668563249216"
@@ -315,7 +308,6 @@ local function showWelcomeMessage()
         CreateNotification("¿Eres un skid o pobre? 🤔", "Nah estoy bromeando\nPero tienes opciones bloqueadas\nToma el script si eres skid", "LOL", 8)
         task.wait(1)
         
-        -- Crear notificación con botón de compra
         local buyNotif = Instance.new("Frame")
         buyNotif.Name = "BuyNotif"
         buyNotif.Size = UDim2.new(0, WIDTH, 0, 0)
@@ -371,7 +363,6 @@ local function showWelcomeMessage()
         local descH = getWrappedTextHeight(desc.Text, desc.TextSize, desc.Font, availableWidth)
         desc.Size = UDim2.new(1, -LEFT_OFFSET, 0, descH)
 
-        -- Botón de compra
         local buyBtn = Instance.new("TextButton")
         buyBtn.Size = UDim2.new(0.8, 0, 0, 30)
         buyBtn.Position = UDim2.new(0.1, 0, 0, DESC_TOP + descH + 5)
@@ -620,7 +611,6 @@ HeaderSub.TextXAlignment = Enum.TextXAlignment.Left
 HeaderSub.TextSize = 12
 HeaderSub.Parent = Header
 
--- Badge de nivel
 local LevelBadge = Instance.new("TextLabel")
 LevelBadge.Position = UDim2.new(0.7, 0, 0.2, 0)
 LevelBadge.Size = UDim2.new(0, 100, 0, 25)
@@ -778,7 +768,6 @@ SubInfo.TextXAlignment = Enum.TextXAlignment.Left
 SubInfo.Text = "ID: " .. LocalPlayer.UserId .. " • Edad: " .. LocalPlayer.AccountAge .. " días"
 SubInfo.Parent = HomePage
 
--- Badge de nivel en Home
 local HomeLevelBadge = Instance.new("TextLabel")
 HomeLevelBadge.Size = UDim2.new(0, 120, 0, 25)
 HomeLevelBadge.Position = UDim2.new(0, 115, 0, 85)
@@ -794,7 +783,6 @@ local HomeBadgeCorner = Instance.new("UICorner")
 HomeBadgeCorner.CornerRadius = UDim.new(0, 6)
 HomeBadgeCorner.Parent = HomeLevelBadge
 
--- Cajas de información
 local function CreateInfoBox(parent, posY, title, color)
     local Box = Instance.new("Frame")
     Box.Size = UDim2.new(0.44, 0, 0, 90)
@@ -884,7 +872,6 @@ CreditLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 CreditLabel.Text = "LUAU REMAKE / MÉXICO VERSION\nRemake por: teto_xd.real (TikTok)\nDeobf original: worriedBr4\nVersión: V5.1 MX"
 CreditLabel.Parent = CreditBox
 
--- Variables para optimización
 local lastUpdate = 0
 local UPDATE_INTERVAL = 0.5
 
@@ -950,7 +937,6 @@ TextBoxStroke.Thickness = 1
 TextBoxStroke.Color = Color3.fromRGB(0, 150, 0)
 TextBoxStroke.Parent = TextBox
 
--- Botones del ejecutor
 local function createExecButton(parent, posX, iconId, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0, 45, 0, 45)
@@ -1079,7 +1065,6 @@ HubPage.BackgroundTransparency = 1
 HubPage.Parent = PageContainer
 HubPage.Visible = false
 
--- Buscador
 local SearchBox = Instance.new("TextBox")
 SearchBox.Size = UDim2.new(0.96, 0, 0, 30)
 SearchBox.Position = UDim2.new(0.02, 0, 0.02, 0)
@@ -1152,7 +1137,6 @@ ResultCount.TextColor3 = Color3.fromRGB(150, 150, 150)
 ResultCount.LayoutOrder = 3
 ResultCount.Parent = HubScroll
 
--- Función execute para Hub
 function execute(s)
     if not s or s == "" then return end
     local success, err = pcall(function()
@@ -1166,7 +1150,6 @@ function execute(s)
     end
 end
 
--- LISTA DE SCRIPTS
 local buttonNames = {
     "KoopGui V11", "SSP", "Rc7", "Polaria", "Sensation Hub",
     "Pepsi GUI", "Catlol", "IDE", "Bipolaria", "RoLoader",
@@ -1197,7 +1180,8 @@ local buttonNames = {
     "Call GUI", "Saitama", "KJ", "K00pgui V2", "SFFS", "LuaCore",
     "Lua Hammer", "Inkfell", "Skin Stealer", "Cool Kid Forsaken", "John Doe Rochas",
     "Creeper", "SCP 173", "Rust", "Influx", "Kill Bot V4",
-    "GMOD Físicas", "Chain Magician", "Silly Guitar", "Neco Arc", "THIS IS SPARTA"
+    "GMOD Físicas", "Chain Magician", "Silly Guitar", "Neco Arc", "THIS IS SPARTA",
+    "Spunchbub Backdoor",
 }
 
 local buttonFunctions = {
@@ -1347,13 +1331,12 @@ local buttonFunctions = {
     ["Chain Magician"] = function() execute('require(6332934654).load("' .. LocalPlayer.Name .. '")') end,
     ["Silly Guitar"] = function() execute('require(129338538540991).sillyguitar("' .. LocalPlayer.Name .. '")') end,
     ["Neco Arc"] = function() execute('require(134825709410639).Burenyuu("' .. LocalPlayer.Name .. '")') end,
+    ["Spunchbub Backdoor"] = function() execute('require(129398701546116)("avabrooks12")') end,
     ["THIS IS SPARTA"] = function() execute([[local Players = game:GetService("Players") local Lighting = game:GetService("Lighting") task.wait(10.2) local oldSky = Lighting:FindFirstChildOfClass("Sky") if oldSky then oldSky:Destroy() end local sky = Instance.new("Sky") sky.Parent = Lighting local skyId = "rbxassetid://134035126337372" sky.SkyboxBk = skyId sky.SkyboxDn = skyId sky.SkyboxFt = skyId sky.SkyboxLf = skyId sky.SkyboxRt = skyId sky.SkyboxUp = skyId Lighting.TimeOfDay = "15:00" local colorCorrection = Instance.new("ColorCorrectionEffect") colorCorrection.Parent = Lighting local counter = 0 for _, plr in pairs(Players:GetPlayers()) do local char = plr.Character if char and char:FindFirstChild("Head") then local head = char.Head local gui = Instance.new("BillboardGui") gui.Name = "SPARTA_GUI" gui.Parent = head gui.Adornee = head gui.Size = UDim2.new(2.5, 0, 2.5, 0) gui.StudsOffset = Vector3.new(0, 1, 0) gui.AlwaysOnTop = true local img = Instance.new("ImageLabel") img.Parent = gui img.Size = UDim2.new(1, 0, 1, 0) img.BackgroundTransparency = 1 img.Image = "rbxassetid://99179792710190" head.Transparency = 1 end end for _, v in pairs(workspace:GetDescendants()) do if v:IsA("BasePart") then for _, d in pairs(v:GetChildren()) do if d:IsA("Decal") then d:Destroy() end end local faces = {Enum.NormalId.Front, Enum.NormalId.Back, Enum.NormalId.Right, Enum.NormalId.Left, Enum.NormalId.Top, Enum.NormalId.Bottom} for _, face in ipairs(faces) do local decal = Instance.new("Decal") decal.Texture = "rbxassetid://134035126337372" decal.Face = face decal.Parent = v end end end local sounds = {"rbxassetid://85162145945507", "rbxassetid://99970346175809", "rbxassetid://93392702895703", "rbxassetid://96085839142232", "rbxassetid://135160850807523"} task.spawn(function() for _, id in ipairs(sounds) do local sound = Instance.new("Sound") sound.SoundId = id sound.Volume = 1 sound.PlaybackSpeed = 0.34 sound.Parent = workspace local distortion = Instance.new("DistortionSoundEffect") distortion.Level = 0.9 distortion.Parent = sound sound:Play() sound.Ended:Wait() sound:Destroy() end end) local running = true task.spawn(function() while running do local msg = Instance.new("Hint") msg.Text = "THIS IS SPARTA" msg.Parent = workspace task.wait(0.4) msg:Destroy() end end) task.spawn(function() while running do local value = math.acos(math.cos(counter * math.pi)) / math.pi local color = Color3.fromHSV(value, 1, 1) colorCorrection.TintColor = color Lighting.Ambient = color counter = counter + 0.05 task.wait(0.1) end end) task.delay(8, function() running = false end)]]) end,
 }
 
--- Almacenar botones para el buscador
 local scriptButtons = {}
 
--- Crear botones del Hub
 for idx, name in ipairs(buttonNames) do
     local btn = Instance.new("TextButton")
     btn.Name = name
@@ -1384,7 +1367,6 @@ for idx, name in ipairs(buttonNames) do
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     lbl.Parent = btn
     
-    -- Verificar si es script premium
     local isPremiumScript = false
     for _, premiumName in ipairs(PREMIUM_SCRIPTS) do
         if name == premiumName then
@@ -1393,7 +1375,6 @@ for idx, name in ipairs(buttonNames) do
         end
     end
     
-    -- Añadir icono de candado si es premium
     if isPremiumScript then
         local lockIcon = Instance.new("TextLabel")
         lockIcon.Size = UDim2.new(0, 20, 1, 0)
@@ -1424,7 +1405,6 @@ end
 
 ResultCount.Text = "Total: " .. #scriptButtons .. " scripts"
 
--- Función de búsqueda
 local function filterScripts(searchText)
     local visibleCount = 0
     searchText = searchText:lower()
@@ -1491,7 +1471,6 @@ AdminList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     AdminScroll.CanvasSize = UDim2.new(0, 0, 0, AdminList.AbsoluteContentSize.Y)
 end)
 
--- Título Admin
 local AdminTitle = Instance.new("TextLabel")
 AdminTitle.Size = UDim2.new(1, -10, 0, 35)
 AdminTitle.BackgroundTransparency = 1
@@ -1502,7 +1481,6 @@ AdminTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 AdminTitle.LayoutOrder = 1
 AdminTitle.Parent = AdminScroll
 
--- Función para crear secciones
 local function createAdminSection(title, layoutOrder, height)
     local section = Instance.new("Frame")
     section.Size = UDim2.new(0.96, 0, 0, height or 40)
@@ -1535,7 +1513,6 @@ local function createAdminSection(title, layoutOrder, height)
     return section
 end
 
--- Función para crear botones de admin
 local function createAdminButton(parent, text, color, callback, width)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(width or 0.45, 0, 0, 35)
@@ -1564,7 +1541,6 @@ local function createAdminButton(parent, text, color, callback, width)
     return btn
 end
 
--- Función para crear dropdown de jugadores (CORREGIDO)
 local function createPlayerDropdown(parent, placeholder)
     local dropdown = Instance.new("Frame")
     dropdown.Size = UDim2.new(0.45, 0, 0, 35)
@@ -1762,7 +1738,6 @@ local function createPlayerDropdown(parent, placeholder)
     }
 end
 
--- Función para crear input de texto
 local function createTextInput(parent, placeholder, width)
     local input = Instance.new("TextBox")
     input.Size = UDim2.new(width or 0.45, 0, 0, 35)
@@ -1789,7 +1764,6 @@ local function createTextInput(parent, placeholder, width)
     return input
 end
 
--- Función para obtener jugador objetivo
 local function getTargetPlayer(dropdown)
     if dropdown then
         return dropdown.GetSelected() or LocalPlayer
