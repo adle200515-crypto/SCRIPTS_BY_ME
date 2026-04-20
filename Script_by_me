@@ -51,7 +51,7 @@ local PREMIUM_GAMEPASS_ID = 1796996414 -- TU GAMEPASS ID
 local AMIGOS = {
     10233126593,  -- Amigo 1
     8152564798,  -- Amigo 2
-    555666777,  -- Amigo 3
+    10752269211,  -- Amigo 3
 }
 
 -- Variables de estado
